@@ -56,7 +56,6 @@ public class GestorSQL {
                 System.out.println("Opcion no valida, debe ser 1 o 2");
                 break;
         }
-        return;
     }
 
     /*
