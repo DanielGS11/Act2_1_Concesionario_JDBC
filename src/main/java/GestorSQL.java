@@ -51,11 +51,12 @@ public class GestorSQL {
                     System.out.println("Error de Conexion: " +  e.getMessage());
                 }
                 break;
-s
+
             default:
                 System.out.println("Opcion no valida, debe ser 1 o 2");
                 break;
         }
+        return;
     }
 
     /*
