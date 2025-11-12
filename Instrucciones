@@ -1,5 +1,5 @@
 ---------------------------------------------------- Tareas ------------------------------------------------------------
-- Conectar BBDD: El Usuario elige la conexion (SQLite o MySQL) leyendo el fichero config.properties
+- **HECHO** Conectar BBDD (ConectarBBDD()): El Usuario elige la conexion (SQLite o MySQL) leyendo el fichero config.properties
 
 - Inicializar/Crear Tablas: Ejecutar DDL (Create if not exists...)
 
