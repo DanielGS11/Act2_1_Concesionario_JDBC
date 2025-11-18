@@ -3,11 +3,11 @@
 
 - **HECHO** Inicializar/Crear Tablas: Ejecutar DDL (Create if not exists...)
 
-- Registrar Propetario: Dar de alta a un nuevo cliente en la BBDD
+- **HECHO** Registrar Propetario: Dar de alta a un nuevo cliente en la BBDD
 
-- Insertar Coche: Pedir los datos por consola e insertarlo, al principio no tiene propietario (Es del concesionario
+- **HECHO** Insertar Coche: Pedir los datos por consola e insertarlo, al principio no tiene propietario (Es del concesionario
 
-- Importar Coches: Leer CSV y añadir los coches a la BBDD
+- **HECHO** Importar Coches: Leer CSV y añadir los coches a la BBDD
 -- Debe ser transaccional, o todos o ninguno
 
 - Listar Coches del Concesionario: Mostrar Coches sin propietario (Del concesionario)
