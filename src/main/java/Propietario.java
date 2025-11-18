@@ -5,8 +5,7 @@ public class Propietario {
     private String apellidos;
     private String telefono;
 
-    public Propietario(String dni, String nombre, String apellidos, String telefono) {
-        this.dni = dni;
+    public Propietario(String nombre, String apellidos, String telefono) {
         this.nombre = nombre;
         this.apellidos = apellidos;
         this.telefono = telefono;

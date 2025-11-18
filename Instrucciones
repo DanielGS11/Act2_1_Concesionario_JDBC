@@ -1,7 +1,7 @@
 ---------------------------------------------------- Tareas ------------------------------------------------------------
 - **HECHO** Conectar BBDD (ConectarBBDD()): El Usuario elige la conexion (SQLite o MySQL) leyendo el fichero config.properties
 
-- Inicializar/Crear Tablas: Ejecutar DDL (Create if not exists...)
+- **HECHO** Inicializar/Crear Tablas: Ejecutar DDL (Create if not exists...)
 
 - Registrar Propetario: Dar de alta a un nuevo cliente en la BBDD
 
@@ -31,13 +31,13 @@
 
 
 ---------------------------------------------------- Tener en Cuenta ---------------------------------------------------
-- La creacion del schema y BBDD debe hacerse desde Java
+- **HECHO** La creacion del schema y BBDD debe hacerse desde Java
 
-- Usar config.properties para los parametros de conexion (URL, drivers, user, password) y rutas de ficheros
+- **HECHO** Usar config.properties para los parametros de conexion (URL, drivers, user, password) y rutas de ficheros
 
 - El codigo debe poder operar con SQLite (Embebido) y MySQL
 
-- La matricula (Coches) y el DNI (Propietarios) son claves Primarias
+- **HECHO** La matricula (Coches) y el DNI (Propietarios) son claves Primarias
 
 - Gestionar excepciones correspondientes
 
