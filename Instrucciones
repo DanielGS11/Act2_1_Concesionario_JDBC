@@ -54,7 +54,7 @@
 
 - Debe Contener:
 -- Carpeta del proyecto
--- Fichero schema_concesionario.sql con el DDL y el "Create Procedure"
+-- Fichero schema_concesionario.sql con el DDL (create database) y el "Create Procedure"
 -- Fichero README.txt con las ventajas e inconvenientes encontradas entre conectores (SQLite vs MySQL)
 
 ---------------------------------------------------- Criterios ---------------------------------------------------------
