@@ -4,10 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class GestorSQL {
     private Concesionario concesionario = new Concesionario();
@@ -46,6 +43,10 @@ public class GestorSQL {
                     conexion = DriverManager.getConnection(propiedades.get(1));
 
                     System.out.println("Conexion establecida con la base de datos SQLite");
+
+                    Statement foreignKeys = conexion.createStatement();
+
+                    foreignKeys.executeQuery("PRAGMA foreign_keys = ON");
                 } catch (SQLException e) {
                     System.out.println("Error de Conexion: " + e.getMessage());
                 }
@@ -169,7 +170,7 @@ public class GestorSQL {
         }
 
         try {
-            PreparedStatement comprobarPropietarios  = conexion.prepareStatement("SELECT * FROM propietarios WHERE dni= ? ");
+            PreparedStatement comprobarPropietarios = conexion.prepareStatement("SELECT * FROM propietarios WHERE dni= ? ");
             comprobarPropietarios.setString(1, dni);
 
             ResultSet rs = comprobarPropietarios.executeQuery();
@@ -197,7 +198,7 @@ public class GestorSQL {
     }
 
 
-    public void registrarCoche(String matricula, String marca, String modelo, List<String> extras, double precio) {
+    public void registrarCoche(String matricula, String marca, String modelo, String extras, double precio) {
         if (!comprobarConexion()) {
             return;
         }
@@ -225,7 +226,7 @@ public class GestorSQL {
         }
 
         try {
-            PreparedStatement comprobarCocheDuplicado  = conexion.prepareStatement("SELECT * FROM coches WHERE matricula= ? ");
+            PreparedStatement comprobarCocheDuplicado = conexion.prepareStatement("SELECT * FROM coches WHERE matricula= ? ");
             comprobarCocheDuplicado.setString(1, matricula);
 
             ResultSet rs = comprobarCocheDuplicado.executeQuery();
@@ -237,7 +238,7 @@ public class GestorSQL {
                 }
             }
 
-            PreparedStatement coche = conexion.prepareStatement("INSERT INTO coches(matricula, marca, modelo, extras, precio) VALUES (?, ?, ?, ?, ?);");
+            PreparedStatement coche = conexion.prepareStatement("INSERT INTO coches(matricula, marca, modelo, extras, precio, id_propietario) VALUES (?, ?, ?, ?, ?, 1);");
 
             coche.setString(1, matricula);
             coche.setString(2, marca);
@@ -297,7 +298,7 @@ public class GestorSQL {
             try {
                 conexion.rollback();
                 System.out.printf("Importacion cancelada con exito. Compruebe que no haya ningun coche en '%s' " +
-                                "cuya matricula exista en la base de datos.\n", propiedades.get(2));
+                        "cuya matricula exista en la base de datos.\n", propiedades.get(2));
             } catch (SQLException ex) {
                 System.out.println("Error: " + ex.getMessage());
             }
@@ -310,6 +311,191 @@ public class GestorSQL {
         }
     }
 
+    public void cochesDeConcesionario() {
+        if (!comprobarConexion()) {
+            return;
+        }
+
+        try {
+            Statement cochesConcesionario = conexion.createStatement();
+
+            ResultSet rs = cochesConcesionario.executeQuery("SELECT * FROM coches WHERE id_propietario IS NULL");
+
+            int contadorCochesConcesionario = 0;
+
+            while (rs.next()) {
+                contadorCochesConcesionario++;
+
+                List<String> coche = new ArrayList<>(List.of("Matricula (CLAVE): " + rs.getString("matricula"),
+                        "\tMarca: " + rs.getString("marca"), "\tModelo: " + rs.getString("modelo"),
+                        "\tExtras: " + rs.getString("matricula"), "\tPrecio: " + rs.getString("precio"),
+                        "\tPropietario: " + (rs.getString("id_propietario") == null ? "Concesionario" : rs.getString("id_propietario"))));
+
+                coche.forEach(System.out::println);
+            }
+
+            if (contadorCochesConcesionario == 0) {
+                System.out.println("No hay coches cuyo propietario sea el concesionario");
+            } else {
+                System.out.println("Total de coches cuyo propietario es el concesionario: " + contadorCochesConcesionario);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    public void cochesConPropietario() {
+        if (!comprobarConexion()) {
+            return;
+        }
+
+        try {
+            Statement cochesPropietario = conexion.createStatement();
+
+            ResultSet rs = cochesPropietario.executeQuery("SELECT coches.*, propietarios.dni FROM coches JOIN propietarios ON " +
+                    "propietarios.id_propietario = coches.id_propietario WHERE coches.id_propietario IS NOT NULL");
+
+            int contadorCochesPropietario = 0;
+
+            while (rs.next()) {
+                contadorCochesPropietario++;
+
+                List<String> coche = new ArrayList<>(List.of("Matricula (CLAVE): " + rs.getString("matricula"),
+                        "\tMarca: " + rs.getString("marca"), "\tModelo: " + rs.getString("modelo"),
+                        "\tExtras: " + rs.getString("matricula"), "\tPrecio: " + rs.getString("precio"),
+                        "\tPropietario: " + rs.getString("id_propietario"),
+                        "\tDNI del Propietario: " + rs.getString("dni")));
+
+                coche.forEach(System.out::println);
+            }
+
+            if (contadorCochesPropietario == 0) {
+                System.out.println("No hay coches con propietario");
+            } else {
+                System.out.println("Total de coches con propietario: " + contadorCochesPropietario);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    public void modificarCoche(String matricula) {
+        if (!comprobarConexion()) {
+            return;
+        }
+
+        try {
+            PreparedStatement coche = conexion.prepareStatement("SELECT * FROM coches WHERE matricula = ?");
+
+            coche.setString(1, matricula);
+
+            ResultSet rs = coche.executeQuery();
+
+            if (rs.next()) {
+                Scanner sc = new Scanner(System.in);
+
+                String marca = rs.getString("marca");
+                String modelo = rs.getString("modelo");
+                String extras = rs.getString("extras") == null ? "Ninguno" : rs.getString("extras");
+                String precio = rs.getString("precio");
+                String id_propietario = rs.getString("id_propietario") == null ? "Concesionario" : rs.getString("id_propietario");
+
+                System.out.printf("""
+                                Estos son los datos del coche con matricula '%s':
+                                \tMarca: %s
+                                \tModelo: %s
+                                \tExtras: %s
+                                \tPrecio: %s
+                                \tID del Propietario: %s
+                                """
+                        ,matricula, marca, modelo, extras, precio,
+                        id_propietario.equals("Concesionario") ? "Propiedad del Concesionario" : id_propietario
+                );
+
+                System.out.println("Introduzca la nueva Marca del coche\n(Si no quiere cambiarla, pulse intro)");
+                String newMarca = sc.nextLine();
+
+                if (!newMarca.isEmpty()) {
+                    marca = newMarca.toUpperCase().charAt(0) + newMarca.trim().toLowerCase().substring(1, newMarca.length());
+                }
+
+                System.out.println("Introduzca el nuevo Modelo del coche\n(Si no quiere cambiarlo, pulse intro)");
+                String newModelo = sc.nextLine();
+
+                if (!newModelo.isEmpty()) {
+                    modelo = newModelo.toUpperCase().charAt(0) + newModelo.trim().toLowerCase().substring(1, newModelo.length());
+                }
+
+                System.out.println("Introduzca los nuevos Extras del coche\n(Si no quiere cambiarlo, pulse intro" +
+                        " o, si el coche no lleva extras, escriba 'nada')");
+                String newExtras = sc.nextLine();
+
+                if (newExtras.trim().equalsIgnoreCase("nada")) {
+                    extras = "Ninguno";
+                } else if (!newExtras.isEmpty()) {
+                    extras = newExtras.trim();
+                }
+
+                System.out.println("Introduzca el nuevo Precio del coche\n[Si lleva decimales, pongalo con un '.'] " +
+                        "(Si no quiere cambiarlo, pulse intro)");
+                String newPrecio = sc.nextLine();
+
+                if (!newPrecio.isEmpty()) {
+                    precio = newPrecio.trim();
+                }
+
+                PreparedStatement newCoche = conexion.prepareStatement("UPDATE coches " +
+                        "SET marca = ?," +
+                        "modelo = ?," +
+                        "extras = ?," +
+                        "precio = ?" +
+                        "WHERE matricula = ?");
+
+                newCoche.setString(1, marca);
+                newCoche.setString(2, modelo);
+                newCoche.setString(3, extras);
+                newCoche.setDouble(4, Double.parseDouble(precio));
+                newCoche.setString(5, matricula);
+
+                newCoche.executeUpdate();
+                System.out.println("Coche modificado con exito");
+            } else {
+                System.out.printf("No se encontro un coche con matricula '%s'\n", matricula);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    public void borrarCoche(String matricula) {
+        if (!comprobarConexion()) {
+            return;
+        }
+
+        try {
+            PreparedStatement coche = conexion.prepareStatement("SELECT * FROM coches WHERE matricula = ?");
+
+            coche.setString(1, matricula);
+
+            ResultSet rs = coche.executeQuery();
+
+            if (rs.next()) {
+                PreparedStatement borrarCoche = conexion.prepareStatement("DELETE FROM coches WHERE matricula = ?");
+
+                borrarCoche.setString(1, matricula);
+
+                borrarCoche.executeUpdate();
+                System.out.println("Coche borrado con exito");
+
+            } else {
+                System.out.printf("No se encontro un coche con matricula '%s'\n", matricula);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
     public void limpiarTablas() {
         if (!comprobarConexion()) {
             return;
@@ -318,9 +504,13 @@ public class GestorSQL {
         try {
             Statement limpiarTablas = conexion.createStatement();
 
-            limpiarTablas.addBatch("DELETE FROM propietarios;");
-            limpiarTablas.addBatch("DELETE FROM coches;");
-            limpiarTablas.addBatch("DELETE FROM traspasos;");
+            limpiarTablas.addBatch("DROP TABLE IF EXISTS traspasos;");
+
+            limpiarTablas.addBatch("DROP TABLE IF EXISTS coches;");
+
+
+            limpiarTablas.addBatch("DROP TABLE IF EXISTS propietarios");
+
 
             limpiarTablas.executeBatch();
         } catch (SQLException e) {

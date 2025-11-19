@@ -10,15 +10,15 @@
 - **HECHO** Importar Coches: Leer CSV y añadir los coches a la BBDD
 -- Debe ser transaccional, o todos o ninguno
 
-- Listar Coches del Concesionario: Mostrar Coches sin propietario (Del concesionario)
+- **HECHO** Listar Coches del Concesionario: Mostrar Coches sin propietario (Del concesionario)
 
-- Listar Coches con Propietario: Mostrar coches con propietario y su DNI
+- **HECHO** Listar Coches con Propietario: Mostrar coches con propietario y su DNI
 
-- Modificar Coche: Pedir una matricula y actualizar los datos
+- **HECHO** Modificar Coche: Pedir una matricula y actualizar los datos
 
-- Borrar Coche: Pedir una matricula y eliminarlo
+- **HECHO** Borrar Coche: Pedir una matricula y eliminarlo
 
-- Realizar Traspaso: Pedir DNI del comprados, la matricula del coche y el pago
+- Realizar Traspaso: Pedir DNI del comprador, la matricula del coche y el pago
 -- Verificar que la matricula y el comprador existen
 -- Realizar de forma Transaccional
 
