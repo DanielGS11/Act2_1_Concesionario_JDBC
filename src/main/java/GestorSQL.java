@@ -495,6 +495,38 @@ public class GestorSQL {
         }
     }
 
+    public void realizarTraspaso(String dni, String matricula, double pago) {
+        if (!comprobarConexion()) {
+            return;
+        }
+
+        try {
+            conexion.setAutoCommit(false);
+
+            PreparedStatement coche = conexion.prepareStatement("SELECT * FROM coches WHERE matricula = ?");
+            PreparedStatement cliente = conexion.prepareStatement("SELECT * FROM propietarios WHERE dni = ?");
+
+            coche.setString(1, matricula);
+            cliente.setString(1, dni);
+
+            ResultSet cocheExists = coche.executeQuery();
+            ResultSet clienteExists = coche.executeQuery();
+
+            if (cocheExists.next() && clienteExists.next()) {
+                if (Double.parseDouble(cocheExists.getString("precio")) > pago) {
+                    System.out.println("Pago insuficiente");
+                } else {
+
+                }
+            } else {
+                System.out.printf("No se encontro un coche con matricula '%s'\n", matricula);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
     public void limpiarTablas() {
         if (!comprobarConexion()) {
             return;
