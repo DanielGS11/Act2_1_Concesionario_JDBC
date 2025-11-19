@@ -935,7 +935,6 @@ public class GestorSQL {
     /*
     ------------------------------------------------ METODOS AUXILIARES ------------------------------------------------
     */
-
     /*
     NOTA: Si ya se cargaron las propiedades o las lineas del CSV, los metodos auxiliares lo comprueban y no ejecutan
     todo el proceso, asi se ahorra carga innecesaria al programa al estar ya cargado
