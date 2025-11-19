@@ -486,7 +486,6 @@ public class GestorSQL {
 
                 borrarCoche.executeUpdate();
                 System.out.println("Coche borrado con exito");
-
             } else {
                 System.out.printf("No se encontro un coche con matricula '%s'\n", matricula);
             }
